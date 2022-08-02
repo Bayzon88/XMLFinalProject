@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <title>Document</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      #container {
+        margin: 10px;
+        padding: 5px;
+        border: 1px solid black;
+        display: flex;
+        flex-direction: column;
+        width: 800px;
+        font-size: 1rem;
+      }
+      #title {
+        width: 100%;
+      }
+      #dataContainer {
+        display: flex;
+        justify-content: space-between;
+        position: relative;
+        height: 80px;
+      }
+
+      #author {
+        top: 1rem;
+        position: absolute;
+      }
+
+      #url {
+        position: absolute;
+        bottom: 0;
+      }
+      #subreddit {
+        position: absolute;
+        top: 0;
+      }
+      #subreddit::before {
+        content: "/r/";
+      }
+      #score {
+        position: absolute;
+        right: 0;
+      }
+    </style>
+  </head>
+  <body onload="search_reddit()">
+    <input id="search_parameter" type="text" placeholder="Enter Search parameter" />
+    <button onclick="search_reddit()">Search</button>
+    <section id="reddit"></section>
+    <script>
+      const search_reddit = () => {
+        let search_parameter = document.getElementById("search_parameter").value;
+        console.log(search_parameter);
+        const CUSTOM_URL = `https://www.reddit.com/search.json?sort=top&limit=100&q=${search_parameter}`;
+        console.log(CUSTOM_URL);
+        //   const URL = "https://www.reddit.com/search.json?q=ajax";
+        fetch(CUSTOM_URL)
+          .then((response) => response.json())
+          .then((data) => BuildGUI(data));
+      };
+
+      function BuildGUI(data) {
+        console.log(data);
+        let section = document.getElementById("reddit");
+        section.innerHTML = "";
+        for (dataPoint of data.data.children) {
+          //Div containing information
+          let container = document.createElement("div");
+          container.setAttribute("id", "container");
+          let dataContainer = document.createElement("div");
+          dataContainer.setAttribute("id", "dataContainer");
+
+          //Create HTML elements to display data
+          let title = document.createElement("h3");
+          title.setAttribute("id", "title");
+          let author = document.createElement("h4");
+          author.setAttribute("id", "author");
+          let subreddit = document.createElement("h4");
+          subreddit.setAttribute("id", "subreddit");
+          let url = document.createElement("h4");
+          url.setAttribute("id", "url");
+          let score = document.createElement("h4");
+          score.setAttribute("id", "score");
+          let flair = document.createElement("h4");
+
+          //Adding data to the HTML elements
+          title.textContent = dataPoint.data.title;
+          author.textContent = dataPoint.data.author;
+          subreddit.textContent = dataPoint.data.subreddit;
+          url.textContent = dataPoint.data.url;
+          score.textContent = dataPoint.data.score;
+
+          //Adding HTML elements to the "reddit" section
+          container.appendChild(title);
+          dataContainer.appendChild(author);
+          dataContainer.appendChild(subreddit);
+          dataContainer.appendChild(url);
+          dataContainer.appendChild(score);
+          dataContainer.appendChild(flair);
+
+          section.append(container);
+          container.append(dataContainer);
+        }
+      }
+    </script>
+  </body>
+</html>
